@@ -121,3 +121,18 @@ def test_observation_bounds():
     for _ in range(200):
         env.step(random_valid_actions(env, rng))
         assert (env.observations >= 0).all() and (env.observations <= 1).all()
+
+
+def test_seed_controls_graph_generation():
+    first = make_env(num_envs=4, seed=123)
+    second = make_env(num_envs=4, seed=123)
+    different = make_env(num_envs=4, seed=124)
+
+    def signatures(env):
+        return [
+            (g.n, g.edges, g.src, g.tgt, g.path)
+            for g in env.graphs
+        ]
+
+    assert signatures(first) == signatures(second)
+    assert signatures(first) != signatures(different)

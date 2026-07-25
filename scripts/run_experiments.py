@@ -9,11 +9,13 @@ import argparse
 import copy
 import json
 import os
+import random
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-import torch  # noqa: F401  (preloads dylibs for pufferlib._C)
+import numpy as np
+import torch  # preloads dylibs for pufferlib._C
 import pufferlib.vector
 from pufferlib import pufferl
 
@@ -38,7 +40,21 @@ EXPERIMENTS = {
 }
 
 
-def base_config(steps, num_envs, device):
+def seed_everything(seed):
+    """Seed policy initialization, action sampling, and graph generation."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def artifact_stem(name, seed, tag=None):
+    parts = [tag, name, f'seed{seed}']
+    return '-'.join(str(part) for part in parts if part)
+
+
+def base_config(steps, num_envs, device, seed):
     return dict(
         env=dict(num_envs=num_envs, beta=1.0, binary_penalty=False,
                  penalty=1.0, r_goal=10.0, step_cost=0.01, n_min=8, n_max=16,
@@ -46,7 +62,7 @@ def base_config(steps, num_envs, device):
                  report_interval=32),
         train=dict(
             name='dijkwalk', project='dijkwalk', env='graphwalk',
-            seed=42, torch_deterministic=True, cpu_offload=False,
+            seed=seed, torch_deterministic=True, cpu_offload=False,
             device=device, optimizer='muon', anneal_lr=True,
             precision='float32', total_timesteps=steps, learning_rate=0.015,
             gamma=0.995, gae_lambda=0.90, update_epochs=1, clip_coef=0.2,
@@ -62,14 +78,15 @@ def base_config(steps, num_envs, device):
     )
 
 
-def run_one(name, spec, steps, num_envs, device, out_dir):
-    cfg = base_config(steps, num_envs, device)
+def run_one(name, spec, steps, num_envs, device, out_dir, seed, tag=None):
+    seed_everything(seed)
+    cfg = base_config(steps, num_envs, device, seed)
     cfg['env'].update(spec.get('env', {}))
     cfg['train']['use_rnn'] = spec.get('rnn') is not None
 
     vecenv = pufferlib.vector.make(
         lambda **kw: GraphWalk(**kw), env_kwargs=cfg['env'],
-        backend='Serial', num_envs=1)
+        backend='Serial', num_envs=1, seed=seed)
     policy = POLICIES[spec.get('policy', 'Policy')](
         vecenv.driver_env, hidden_size=128)
     if spec.get('rnn'):
@@ -85,13 +102,15 @@ def run_one(name, spec, steps, num_envs, device, out_dir):
         if logs:
             curve.append({k: float(logs[k]) for k in KEEP if k in logs})
 
-    ckpt = os.path.join(out_dir, f'{name}.pt')
+    stem = artifact_stem(name, seed, tag)
+    ckpt = os.path.join(out_dir, f'{stem}.pt')
     torch.save(policy.state_dict(), ckpt)
     trainer.close()
 
     result = dict(name=name, spec=copy.deepcopy(spec), n_params=n_params,
-                  steps=steps, num_envs=num_envs, curve=curve)
-    with open(os.path.join(out_dir, f'{name}.json'), 'w') as f:
+                  seed=seed, tag=tag, artifact_stem=stem, steps=steps,
+                  num_envs=num_envs, curve=curve)
+    with open(os.path.join(out_dir, f'{stem}.json'), 'w') as f:
         json.dump(result, f)
     sr = [c['environment/success_rate'] for c in curve
           if 'environment/success_rate' in c]
@@ -107,6 +126,8 @@ def main():
     ap.add_argument('--device', default='cpu')
     ap.add_argument('--out', default='viz-data')
     ap.add_argument('--only', nargs='*', default=None)
+    ap.add_argument('--seed', type=int, default=42)
+    ap.add_argument('--tag', default=None)
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -115,8 +136,10 @@ def main():
     for name in names:
         print(f'=== {name} ===', flush=True)
         results.append(run_one(name, EXPERIMENTS[name], args.steps,
-                               args.num_envs, args.device, args.out))
-    with open(os.path.join(args.out, 'experiments.json'), 'w') as f:
+                               args.num_envs, args.device, args.out,
+                               args.seed, args.tag))
+    manifest_stem = artifact_stem('-'.join(names), args.seed, args.tag)
+    with open(os.path.join(args.out, f'experiments-{manifest_stem}.json'), 'w') as f:
         json.dump(results, f)
     print('all experiments complete')
 
