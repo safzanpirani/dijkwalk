@@ -29,13 +29,32 @@ def baseline_actions(name: str, rng: np.random.Generator) -> ActionFn:
     return choose
 
 
+def _summary(
+    completed: dict[str, list[float]],
+) -> dict[str, float | int | None]:
+    return {
+        'episodes': len(completed['success']),
+        'successes': int(sum(completed['success'])),
+        'success_rate': float(np.mean(completed['success'])),
+        'episode_length': float(np.mean(completed['length'])),
+        'opt_gap': (
+            float(np.mean(completed['opt_gap']))
+            if completed['opt_gap'] else None
+        ),
+        'backward_rate': float(np.mean(completed['backward_rate'])),
+        'invalid_rate': float(np.mean(completed['invalid_rate'])),
+        'two_cycle_rate': float(np.mean(completed['two_cycle_rate'])),
+        'two_cycle_episode_rate': float(np.mean(completed['has_two_cycle'])),
+    }
+
+
 def evaluate_episodes(
     env: GraphWalk,
     choose_actions: ActionFn,
     episodes: int,
     seed: int,
     reset_done: DoneFn | None = None,
-) -> dict[str, float | int]:
+) -> dict[str, float | int | None]:
     """Evaluate complete episodes while the env auto-resets finished rows."""
     observations, _ = env.reset(seed=seed)
     completed: dict[str, list[float]] = {
@@ -114,16 +133,97 @@ def evaluate_episodes(
         if reset_done is not None:
             reset_done(done)
 
-    return {
-        'episodes': episodes,
-        'success_rate': float(np.mean(completed['success'])),
-        'episode_length': float(np.mean(completed['length'])),
-        'opt_gap': (
-            float(np.mean(completed['opt_gap']))
-            if completed['opt_gap'] else float('nan')
-        ),
-        'backward_rate': float(np.mean(completed['backward_rate'])),
-        'invalid_rate': float(np.mean(completed['invalid_rate'])),
-        'two_cycle_rate': float(np.mean(completed['two_cycle_rate'])),
-        'two_cycle_episode_rate': float(np.mean(completed['has_two_cycle'])),
+    return _summary(completed)
+
+
+def evaluate_fixed_graphs(
+    env: GraphWalk,
+    graphs,
+    choose_actions: ActionFn,
+    reset_done: DoneFn | None = None,
+) -> dict[str, float | int | None]:
+    """Evaluate exactly one episode for every graph in a matched batch."""
+    if len(graphs) != env.num_envs:
+        raise ValueError(
+            f'expected {env.num_envs} graphs, received {len(graphs)}')
+    observations, _ = env.reset_with_graphs(graphs)
+    completed: dict[str, list[float]] = {
+        'success': [],
+        'length': [],
+        'opt_gap': [],
+        'backward_rate': [],
+        'invalid_rate': [],
+        'two_cycle_rate': [],
+        'has_two_cycle': [],
     }
+    active = np.ones(env.num_envs, dtype=bool)
+    previous_u = np.full(env.num_envs, -1, dtype=np.int64)
+    two_cycles = np.zeros(env.num_envs, dtype=np.int64)
+    invalid_moves = np.zeros(env.num_envs, dtype=np.int64)
+
+    while active.any():
+        actions = np.asarray(
+            choose_actions(observations, env), dtype=np.int64)
+        if actions.shape != (env.num_envs,):
+            raise ValueError(
+                f'actions must have shape {(env.num_envs,)}, got {actions.shape}')
+        if np.any((actions < 0) | (actions >= K)):
+            raise ValueError('actions must be valid slot indices')
+
+        rows = np.arange(env.num_envs)
+        slots = np.stack(env.slots)
+        weights = np.stack(env.slot_w)
+        current_u = env.u.copy()
+        destination = slots[rows, actions]
+        valid = destination >= 0
+        invalid_moves += active & ~valid
+        two_cycles += active & valid & (destination == previous_u)
+
+        backward_move = np.zeros(env.num_envs, dtype=np.int64)
+        success = np.zeros(env.num_envs, dtype=bool)
+        optimal_cost = np.zeros(env.num_envs, dtype=np.float64)
+        for i in np.flatnonzero(active):
+            graph = env.graphs[i]
+            optimal_cost[i] = graph.phi[graph.src]
+            if valid[i]:
+                backward_move[i] = (
+                    graph.phi[destination[i]] > graph.phi[current_u[i]])
+                success[i] = destination[i] == graph.tgt
+
+        next_steps = env.steps + 1
+        next_backward = env.backward + backward_move
+        next_cost = env.path_cost + np.where(
+            valid, weights[rows, actions], 0.0)
+        predicted_done = success | (next_steps >= env.max_steps)
+
+        observations, _, terminals, truncations, _ = env.step(actions)
+        actual_done = terminals | truncations
+        if not np.array_equal(
+            predicted_done[active], actual_done[active]
+        ):
+            raise RuntimeError('pre-step completion accounting diverged from env')
+
+        finished = active & actual_done
+        for i in np.flatnonzero(finished):
+            n_steps = int(next_steps[i])
+            is_success = bool(success[i])
+            completed['success'].append(float(is_success))
+            completed['length'].append(float(n_steps))
+            completed['backward_rate'].append(
+                float(next_backward[i] / max(1, n_steps)))
+            completed['invalid_rate'].append(
+                float(invalid_moves[i] / max(1, n_steps)))
+            completed['two_cycle_rate'].append(
+                float(two_cycles[i] / max(1, n_steps - 1)))
+            completed['has_two_cycle'].append(float(two_cycles[i] > 0))
+            if is_success:
+                completed['opt_gap'].append(
+                    float(next_cost[i] / max(optimal_cost[i], 1e-9)))
+
+        previous_u[active] = current_u[active]
+        previous_u[finished] = -1
+        active[finished] = False
+        if reset_done is not None:
+            reset_done(actual_done)
+
+    return _summary(completed)

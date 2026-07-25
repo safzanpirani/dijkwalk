@@ -3,6 +3,7 @@ import torch
 
 from dijkwalk import graphgen
 from dijkwalk.env import GraphWalk, K, F, OBS_DIM
+from dijkwalk.evaluation import evaluate_fixed_graphs
 from dijkwalk.policy import Policy, Transformer, MASK_VALUE
 
 
@@ -136,3 +137,41 @@ def test_seed_controls_graph_generation():
 
     assert signatures(first) == signatures(second)
     assert signatures(first) != signatures(different)
+
+
+def test_frozen_graph_reset_and_large_n_observation_bounds():
+    rng = np.random.default_rng(301)
+    graphs = [graphgen.random_graph(rng, 768, 768) for _ in range(2)]
+    env = make_env(num_envs=2)
+    observations, _ = env.reset_with_graphs(graphs)
+
+    assert all(actual is expected for actual, expected in zip(env.graphs, graphs))
+    assert [int(u) for u in env.u] == [graph.src for graph in graphs]
+    assert (observations >= 0).all() and (observations <= 1).all()
+    assert (observations[:, K * F + 1] == 1.0).all()
+
+
+def test_fixed_graph_evaluation_counts_each_graph_once():
+    rng = np.random.default_rng(302)
+    graphs = [graphgen.random_graph(rng, 8, 8) for _ in range(12)]
+    env = make_env(num_envs=len(graphs), max_steps_factor=1)
+
+    def optimal_actions(_observations, current_env):
+        actions = np.zeros(current_env.num_envs, dtype=np.int64)
+        for i, graph in enumerate(current_env.graphs):
+            u = int(current_env.u[i])
+            candidates = [
+                (w + graph.phi[v], v, slot)
+                for slot, (v, w) in enumerate(zip(
+                    current_env.slots[i], current_env.slot_w[i]))
+                if v >= 0
+            ]
+            actions[i] = int(min(candidates)[2])
+        return actions
+
+    result = evaluate_fixed_graphs(env, graphs, optimal_actions)
+    assert result['episodes'] == len(graphs)
+    assert result['successes'] == len(graphs)
+    assert result['success_rate'] == 1.0
+    assert result['opt_gap'] == 1.0
+    assert result['invalid_rate'] == 0.0

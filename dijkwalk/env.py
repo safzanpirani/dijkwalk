@@ -76,6 +76,10 @@ class GraphWalk(pufferlib.PufferEnv):
 
     def _reset_env(self, i):
         g = graphgen.random_graph(self.rng, self.n_min, self.n_max, self.w_max)
+        self._start_graph(i, g)
+
+    def _start_graph(self, i, g):
+        """Initialize one row from a graph, including externally frozen suites."""
         self.graphs[i] = g
         self.u[i] = g.src
         self.steps[i] = 0
@@ -106,7 +110,7 @@ class GraphWalk(pufferlib.PufferEnv):
             obs[base + 2] = float(self.visited[i][v])
             obs[base + 3] = float(v == g.tgt)
         obs[K * F + 0] = self.steps[i] / self.max_steps[i]
-        obs[K * F + 1] = g.n / N_CAP
+        obs[K * F + 1] = min(g.n / N_CAP, 1.0)
         self.slots[i] = slots
         self.slot_w[i] = slot_w
 
@@ -133,6 +137,16 @@ class GraphWalk(pufferlib.PufferEnv):
         self.tick = 0
         for i in range(self.num_envs):
             self._reset_env(i)
+        return self.observations, []
+
+    def reset_with_graphs(self, graphs):
+        """Reset from an exact graph batch for matched-suite evaluation."""
+        if len(graphs) != self.num_envs:
+            raise ValueError(
+                f'expected {self.num_envs} graphs, received {len(graphs)}')
+        self.tick = 0
+        for i, graph in enumerate(graphs):
+            self._start_graph(i, graph)
         return self.observations, []
 
     def step(self, actions):
