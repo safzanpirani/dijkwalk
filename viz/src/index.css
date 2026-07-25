@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* chart chrome (dataviz reference palette, dark mode) */
+  --color-page: #0d0d0d;
+  --color-surface: #1a1a19;
+  --color-surface-2: #222220;
+  --color-ink: #ffffff;
+  --color-ink-2: #c3c2b7;
+  --color-ink-3: #898781;
+  --color-grid: #2c2c2a;
+  --color-axis: #383835;
+  --color-ring: rgba(255, 255, 255, 0.1);
+
+  /* categorical series, dark-stepped */
+  --color-s1: #3987e5;
+  --color-s2: #d95926;
+  --color-s3: #199e70;
+  --color-s4: #c98500;
+  --color-s5: #d55181;
+
+  --color-good: #0ca30c;
+  --color-critical: #d03b3b;
+
+  /* agent + target accents */
+  --color-agent: #d95926;
+  --color-target: #0ca30c;
+}
+
+html {
+  background: var(--color-page);
+  color: var(--color-ink);
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #d9592644;
+}
+
+/* faint blueprint grid behind everything */
+.blueprint {
+  background-image:
+    linear-gradient(#ffffff05 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff05 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+@keyframes dash-flow {
+  to { stroke-dashoffset: -14; }
+}
+.edge-flow {
+  animation: dash-flow 0.8s linear infinite;
+}
+
+@keyframes pulse-ring {
+  0% { r: 9px; opacity: 0.7; }
+  100% { r: 22px; opacity: 0; }
+}
+.agent-pulse {
+  animation: pulse-ring 1.4s ease-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-up { animation: fade-up 0.5s ease-out both; }

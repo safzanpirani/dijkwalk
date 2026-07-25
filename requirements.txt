@@ -1,0 +1,4 @@
+pufferlib==3.0.0
+torch==2.12.0
+numpy
+pytest

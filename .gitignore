@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+experiments/
+viz-data/
+viz-data-run.log
+*.pt
+viz-shot-*.png
+node_modules/
+dist/
+.DS_Store
+resources
