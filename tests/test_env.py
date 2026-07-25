@@ -1,3 +1,6 @@
+import hashlib
+import json
+
 import numpy as np
 import torch
 
@@ -175,3 +178,47 @@ def test_fixed_graph_evaluation_counts_each_graph_once():
     assert result['success_rate'] == 1.0
     assert result['opt_gap'] == 1.0
     assert result['invalid_rate'] == 0.0
+
+
+def test_step_public_trace_matches_scalar_characterization():
+    """Pin the scalar step's full public trace before vectorizing it."""
+    cases = [
+        (
+            dict(beta=0.7, binary_penalty=False, penalty=1.3),
+            'd4478d0c7c04e1aa4b23dd5d487f0217a14007135da9486b328d8f48e760bf78',
+        ),
+        (
+            dict(beta=1.0, binary_penalty=True, penalty=1.3),
+            '1de333b9c3e71ec61949c6c7ceb6646f5e70351da1a5b1a19d0005726694371c',
+        ),
+    ]
+    for reward_kwargs, expected in cases:
+        env = GraphWalk(
+            num_envs=17,
+            n_min=8,
+            n_max=12,
+            curriculum=False,
+            max_steps_factor=1,
+            report_interval=3,
+            seed=317,
+            r_goal=3.0,
+            step_cost=0.05,
+            **reward_kwargs,
+        )
+        observations, info = env.reset(seed=317)
+        digest = hashlib.sha256()
+        digest.update(np.ascontiguousarray(observations).tobytes())
+        digest.update(json.dumps(
+            info, sort_keys=True, separators=(',', ':')).encode())
+
+        action_rng = np.random.default_rng(2026)
+        for _ in range(120):
+            actions = action_rng.integers(
+                0, K, size=env.num_envs, dtype=np.int64)
+            outputs = env.step(actions)
+            for value in outputs[:4]:
+                digest.update(np.ascontiguousarray(value).tobytes())
+            digest.update(json.dumps(
+                outputs[4], sort_keys=True, separators=(',', ':')).encode())
+
+        assert digest.hexdigest() == expected

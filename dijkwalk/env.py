@@ -59,14 +59,25 @@ class GraphWalk(pufferlib.PufferEnv):
 
         self.rng = np.random.default_rng(seed)
         self.graphs: list[graphgen.GraphInstance] = [None] * num_envs
+        self._capacity = max(int(n_max), int(n_max_final), 1)
         self.u = np.zeros(num_envs, dtype=np.int64)
+        self.tgt = np.zeros(num_envs, dtype=np.int64)
+        self.graph_n = np.zeros(num_envs, dtype=np.int64)
         self.steps = np.zeros(num_envs, dtype=np.int64)
         self.max_steps = np.zeros(num_envs, dtype=np.int64)
         self.path_cost = np.zeros(num_envs, dtype=np.float64)
         self.backward = np.zeros(num_envs, dtype=np.int64)
-        self.visited = [None] * num_envs          # bool array per env, size n
-        self.slots = [None] * num_envs            # node id per slot, -1 = pad
-        self.slot_w = [None] * num_envs           # edge weight per slot
+        self.visited = np.zeros(
+            (num_envs, self._capacity), dtype=bool)
+        self.slots = np.full((num_envs, K), -1, dtype=np.int64)
+        self.slot_w = np.zeros((num_envs, K), dtype=np.float64)
+        self.slot_dphi = np.zeros((num_envs, K), dtype=np.float64)
+        self._node_slots = np.full(
+            (num_envs, self._capacity, K), -1, dtype=np.int64)
+        self._node_slot_w = np.zeros(
+            (num_envs, self._capacity, K), dtype=np.float64)
+        self._node_slot_dphi = np.zeros(
+            (num_envs, self._capacity, K), dtype=np.float64)
 
         # episode stats accumulated between reports
         self._ep = {k: [] for k in ('success', 'length', 'opt_gap',
@@ -74,45 +85,98 @@ class GraphWalk(pufferlib.PufferEnv):
         self._recent_success: list[float] = []    # rolling window for curriculum
         self.tick = 0
 
-    def _reset_env(self, i):
+    def _reset_env(self, i, fill_observation=True):
         g = graphgen.random_graph(self.rng, self.n_min, self.n_max, self.w_max)
-        self._start_graph(i, g)
+        self._start_graph(i, g, fill_observation=fill_observation)
 
-    def _start_graph(self, i, g):
+    def _start_graph(self, i, g, fill_observation=True):
         """Initialize one row from a graph, including externally frozen suites."""
+        self._ensure_capacity(g.n)
         self.graphs[i] = g
         self.u[i] = g.src
+        self.tgt[i] = g.tgt
+        self.graph_n[i] = g.n
         self.steps[i] = 0
         self.max_steps[i] = self.max_steps_factor * g.n
         self.path_cost[i] = 0.0
         self.backward[i] = 0
-        self.visited[i] = np.zeros(g.n, dtype=bool)
+        self.visited[i].fill(False)
         self.visited[i][g.src] = True
-        self._fill_obs(i)
+        self._build_graph_tables(i, g)
+        if fill_observation:
+            self._fill_obs(i)
+
+    def _ensure_capacity(self, required):
+        if required <= self._capacity:
+            return
+        old_capacity = self._capacity
+        self._capacity = required
+
+        visited = np.zeros(
+            (self.num_envs, self._capacity), dtype=bool)
+        visited[:, :old_capacity] = self.visited
+        self.visited = visited
+
+        shape = (self.num_envs, self._capacity, K)
+        node_slots = np.full(shape, -1, dtype=np.int64)
+        node_slots[:, :old_capacity] = self._node_slots
+        self._node_slots = node_slots
+
+        node_slot_w = np.zeros(shape, dtype=np.float64)
+        node_slot_w[:, :old_capacity] = self._node_slot_w
+        self._node_slot_w = node_slot_w
+
+        node_slot_dphi = np.zeros(shape, dtype=np.float64)
+        node_slot_dphi[:, :old_capacity] = self._node_slot_dphi
+        self._node_slot_dphi = node_slot_dphi
+
+    def _build_graph_tables(self, i, g):
+        """Precompute every node's exposed slots once per graph reset."""
+        self._node_slots[i, :g.n].fill(-1)
+        self._node_slot_w[i, :g.n].fill(0.0)
+        self._node_slot_dphi[i, :g.n].fill(0.0)
+        for u, neighbors in enumerate(g.adj):
+            if len(neighbors) > K:
+                neighbors = sorted(
+                    neighbors, key=lambda vw: (vw[1], vw[0]))[:K]
+            for slot, (v, w) in enumerate(neighbors):
+                self._node_slots[i, u, slot] = v
+                self._node_slot_w[i, u, slot] = w
+                self._node_slot_dphi[i, u, slot] = g.phi[u] - g.phi[v]
 
     def _fill_obs(self, i):
         """Recompute neighbor slots of current node and write the obs row."""
-        g = self.graphs[i]
-        u = self.u[i]
-        nbrs = g.adj[u]
-        if len(nbrs) > K:  # keep the K cheapest edges (deterministic)
-            nbrs = sorted(nbrs, key=lambda vw: (vw[1], vw[0]))[:K]
-        slots = np.full(K, -1, dtype=np.int64)
-        slot_w = np.zeros(K, dtype=np.float64)
-        obs = self.observations[i]
-        obs[:] = 0.0
-        for k, (v, w) in enumerate(nbrs):
-            slots[k] = v
-            slot_w[k] = w
-            base = k * F
-            obs[base + 0] = 1.0
-            obs[base + 1] = w / self.w_max
-            obs[base + 2] = float(self.visited[i][v])
-            obs[base + 3] = float(v == g.tgt)
-        obs[K * F + 0] = self.steps[i] / self.max_steps[i]
-        obs[K * F + 1] = min(g.n / N_CAP, 1.0)
-        self.slots[i] = slots
-        self.slot_w[i] = slot_w
+        self._fill_obs_rows(np.asarray([i], dtype=np.int64))
+
+    def _fill_obs_rows(self, rows):
+        """Gather precomputed node tables into observation rows in one batch."""
+        if len(rows) == 0:
+            return
+        rows = np.asarray(rows, dtype=np.int64)
+        nodes = self.u[rows]
+        slots = self._node_slots[rows, nodes]
+        slot_w = self._node_slot_w[rows, nodes]
+        slot_dphi = self._node_slot_dphi[rows, nodes]
+        valid = slots >= 0
+        safe_slots = np.maximum(slots, 0)
+
+        observations = np.zeros(
+            (len(rows), OBS_DIM), dtype=self.observations.dtype)
+        slot_observations = observations[:, :K * F].reshape(-1, K, F)
+        slot_observations[:, :, 0] = valid
+        slot_observations[:, :, 1] = slot_w / self.w_max
+        slot_observations[:, :, 2] = (
+            self.visited[rows[:, None], safe_slots] & valid)
+        slot_observations[:, :, 3] = (
+            slots == self.tgt[rows, None]) & valid
+        observations[:, K * F] = self.steps[rows] / self.max_steps[rows]
+        observations[:, K * F + 1] = np.minimum(
+            self.graph_n[rows] / N_CAP, 1.0)
+
+        self.slots[rows] = slots
+        self.slot_w[rows] = slot_w
+        self.slot_dphi[rows] = slot_dphi
+        self.observations[rows] = observations
 
     def _log_episode(self, i, success):
         g = self.graphs[i]
@@ -146,51 +210,55 @@ class GraphWalk(pufferlib.PufferEnv):
                 f'expected {self.num_envs} graphs, received {len(graphs)}')
         self.tick = 0
         for i, graph in enumerate(graphs):
-            self._start_graph(i, graph)
+            self._start_graph(i, graph, fill_observation=False)
+        self._fill_obs_rows(np.arange(self.num_envs))
         return self.observations, []
 
     def step(self, actions):
         self.rewards[:] = 0.0
         self.terminals[:] = False
         self.truncations[:] = False
-        n_invalid = 0
+        rows = np.arange(self.num_envs)
+        action_slots = np.asarray(actions).astype(np.int64, copy=False)
+        destination = self.slots[rows, action_slots]
+        selected_w = self.slot_w[rows, action_slots]
+        selected_dphi = self.slot_dphi[rows, action_slots]
+        valid = destination >= 0
+        valid_rows = rows[valid]
+        step_rewards = np.full(
+            self.num_envs, -self.step_cost, dtype=np.float64)
 
-        for i in range(self.num_envs):
-            g = self.graphs[i]
-            slot = int(actions[i])
-            v = self.slots[i][slot]
-            r = -self.step_cost
-            self.steps[i] += 1
+        self.steps += 1
+        n_invalid = int((~valid).sum())
+        step_rewards[~valid] -= self.penalty
+        if self.binary_penalty:
+            step_rewards[valid] += (
+                -selected_w[valid] / self.w_max
+                - self.penalty * (selected_dphi[valid] < 0)
+            )
+        else:
+            step_rewards[valid] += (
+                -selected_w[valid] + self.beta * selected_dphi[valid]
+            ) / self.w_max
 
-            if v < 0:  # invalid slot picked: no-op + penalty (mask bug signal)
-                n_invalid += 1
-                r -= self.penalty
-            else:
-                u = self.u[i]
-                w = self.slot_w[i][slot]
-                dphi = g.phi[u] - g.phi[v]
-                if self.binary_penalty:
-                    r += -w / self.w_max - self.penalty * float(dphi < 0)
-                else:
-                    r += (-w + self.beta * dphi) / self.w_max
-                if dphi < 0:
-                    self.backward[i] += 1
-                self.path_cost[i] += w
-                self.u[i] = v
-                self.visited[i][v] = True
+        backward = valid & (selected_dphi < 0)
+        self.backward[backward] += 1
+        self.path_cost[valid] += selected_w[valid]
+        self.u[valid] = destination[valid]
+        self.visited[valid_rows, destination[valid]] = True
 
-            if self.u[i] == g.tgt:
-                r += self.r_goal
-                self.terminals[i] = True
-                self._log_episode(i, success=True)
-                self._reset_env(i)
-            elif self.steps[i] >= self.max_steps[i]:
-                self.truncations[i] = True
-                self._log_episode(i, success=False)
-                self._reset_env(i)
-            else:
-                self._fill_obs(i)
-            self.rewards[i] = r
+        reached_target = self.u == self.tgt
+        truncated = ~reached_target & (self.steps >= self.max_steps)
+        done = reached_target | truncated
+        self.terminals[:] = reached_target
+        self.truncations[:] = truncated
+        step_rewards[reached_target] += self.r_goal
+        self.rewards[:] = step_rewards
+
+        for i in np.flatnonzero(done):
+            self._log_episode(i, success=bool(reached_target[i]))
+            self._reset_env(i, fill_observation=False)
+        self._fill_obs_rows(rows)
 
         if n_invalid:
             self._ep['invalid'].append(n_invalid / self.num_envs)
