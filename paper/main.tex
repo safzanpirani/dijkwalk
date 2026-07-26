@@ -1,7 +1,6 @@
 \documentclass[10pt,twocolumn]{article}
 
 \usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[margin=0.66in,columnsep=0.24in]{geometry}
 \usepackage{amsmath,amssymb}
@@ -11,7 +10,6 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage{enumitem}
 \usepackage{xcolor}
-\usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{balance}
 
@@ -28,20 +26,18 @@
 \renewcommand{\bottomfraction}{0.90}
 \renewcommand{\textfraction}{0.05}
 \renewcommand{\floatpagefraction}{0.85}
+\raggedbottom
 
 \newcommand{\dlt}{\Delta}
 \newcommand{\ph}{\phi}
 \newcommand{\wmax}{w_{\max}}
-\newcommand{\pp}{\text{pp}}
-\newcommand{\ntrain}{n_{\mathrm{train}}}
-\newcommand{\ours}{\textsc{DijkWalk}}
 \newcommand{\code}[1]{\texttt{\small #1}}
-\newcommand{\hashcode}[2]{\texttt{\scriptsize #1\hspace{0pt}#2}}
 
 \title{\vspace{-1.4em}\bfseries
-When Does Directional Reward Shaping Matter?\\[-0.2em]
-\large Same Dijkstra Regret, Two Learning Paradigms, One Graph-Walking Task}
-\author{Anonymous Author(s)}
+When Does Directional Reward Shaping Matter?\\[0.35em]
+{\normalsize\mdseries\itshape
+Same Dijkstra Regret, Two Learning Paradigms, One Graph-Walking Task}}
+\author{Safzan Pirani}
 \date{}
 
 \begin{document}
@@ -257,8 +253,8 @@ transparently rather than equating MACs with wall-clock or data exposure.
 form success (\%) / optimality gap / backward rate (\%).  Optimality gap is
 conditional on success; lower gap and backward rate are better.}
 \label{tab:q1main}
-\footnotesize
-\resizebox{\textwidth}{!}{%
+\small
+\setlength{\tabcolsep}{9pt}
 \begin{tabular}{@{}lllccc@{}}
 \toprule
 Scale & Learner & Decode &
@@ -282,7 +278,7 @@ Large & supervised & greedy
 Large & supervised & sampled
  & 90.90 / 5.77 / 26.30 & 62.67 / 20.65 / 41.00 & 31.33 / 58.85 / 46.23\\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table*}
 
 Table~\ref{tab:q1main} contains the headline 25M comparison.  Sampled far-OOD
@@ -332,7 +328,7 @@ trajectories induced by its own mistakes and recoveries.  The experiment is
 consistent with exposure bias, but does not isolate it from every difference
 between PPO/Muon and soft-KL training.
 
-\section{Q2: A Predeclared Shaping Phase Diagram}
+\section{Q2: A Predeclared Phase Diagram}
 \label{sec:q2}
 
 The main grid trains an LSTM for 5M agent steps in 54 conditions: three rewards
@@ -377,10 +373,12 @@ removes future penalties.  All 162 conditions have zero invalid-action rate.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.88\textwidth]{q2-phase-diagram.pdf}
-\caption{Q2 shaping phase diagram.  Shaping helps systematically in large
-cold-start, tight-horizon regimes, but no goal-bonus level reaches the
-predeclared 15-point gate.}
+\includegraphics[width=\textwidth]{q2-phase-diagram.pdf}
+\caption{Q2 shaping phase diagram: graded ($\beta{=}1$) minus $\beta{=}0$
+sampled success across the six size--horizon cells, at all three goal-bonus
+levels (162 trainings).  Shaping helps systematically in large cold-start,
+tight-horizon regimes, and the ordering is stable across the bonus ablation,
+but no cell at any bonus level reaches the predeclared 15-point gate.}
 \label{fig:q2}
 \end{figure*}
 
@@ -547,8 +545,8 @@ favorable suite or decoding rule.
 \caption{Q1 at the 5M compute match.  Entries are success (\%) / optimality
 gap / backward rate (\%), averaged over three seeds.}
 \label{tab:q1five}
-\footnotesize
-\resizebox{\textwidth}{!}{%
+\small
+\setlength{\tabcolsep}{9pt}
 \begin{tabular}{@{}lllccc@{}}
 \toprule
 Scale & Learner & Decode &
@@ -572,7 +570,7 @@ Large & supervised & greedy
 Large & supervised & sampled
  & 82.23 / 10.19 / 33.63 & 59.90 / 20.84 / 42.36 & 24.50 / 48.62 / 46.22\\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table*}
 
 \section{Suite and Seed Integrity}
@@ -602,7 +600,7 @@ uses NumPy gathers for selected destinations, weights, potential changes,
 rewards, visited-state updates, and observations.  The Python loop remains only
 for terminated rows, preserving reset and graph-RNG order.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
 \caption{Vectorization benchmarks on 1,024 environments.}
 \label{tab:vector}
@@ -640,8 +638,8 @@ files, and 12 evaluation JSONs.  Bulk remote artifacts and the shared virtual
 environment were removed after retrieval; raw logs were retained.
 
 \balance
-{\scriptsize
-\setlength{\bibsep}{1pt plus 0.2ex}
+{\footnotesize
+\setlength{\bibsep}{1.5pt plus 0.3ex}
 \bibliographystyle{plainnat}
 \bibliography{references}
 }
