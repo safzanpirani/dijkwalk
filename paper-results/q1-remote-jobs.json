@@ -1,0 +1,155 @@
+{
+  "host": "server-pc",
+  "gpu": {
+    "model": "NVIDIA GeForce GTX 1080",
+    "compute_capability": [
+      6,
+      1
+    ],
+    "torch_wheel": "2.12.0+cu126"
+  },
+  "execution": {
+    "max_concurrent_gpu_processes": 2,
+    "nice_increment": 10,
+    "omp_threads": 1,
+    "mkl_threads": 1,
+    "scratch_peak": "8.3G"
+  },
+  "jobs": [
+    {
+      "paradigm": "rl",
+      "model": "lstm",
+      "seed": 42,
+      "training_steps": 25000000,
+      "training_wall_seconds": 854,
+      "evaluation_wall_seconds": 45,
+      "training_attempts": 2
+    },
+    {
+      "paradigm": "rl",
+      "model": "lstm",
+      "seed": 43,
+      "training_steps": 25000000,
+      "training_wall_seconds": 839,
+      "evaluation_wall_seconds": 55,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "rl",
+      "model": "lstm",
+      "seed": 44,
+      "training_steps": 25000000,
+      "training_wall_seconds": 886,
+      "evaluation_wall_seconds": 50,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "rl",
+      "model": "transformer",
+      "seed": 42,
+      "training_steps": 25000000,
+      "training_wall_seconds": 2389,
+      "evaluation_wall_seconds": 62,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "rl",
+      "model": "transformer",
+      "seed": 43,
+      "training_steps": 25000000,
+      "training_wall_seconds": 2218,
+      "evaluation_wall_seconds": 59,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "rl",
+      "model": "transformer",
+      "seed": 44,
+      "training_steps": 25000000,
+      "training_wall_seconds": 2818,
+      "evaluation_wall_seconds": 60,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "supervised",
+      "model": "small",
+      "seed": 42,
+      "training_steps": 20000,
+      "training_wall_seconds": 2465,
+      "evaluation_wall_seconds": 4331,
+      "training_attempts": 2
+    },
+    {
+      "paradigm": "supervised",
+      "model": "small",
+      "seed": 43,
+      "training_steps": 20000,
+      "training_wall_seconds": 2689,
+      "evaluation_wall_seconds": 7556,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "supervised",
+      "model": "small",
+      "seed": 44,
+      "training_steps": 20000,
+      "training_wall_seconds": 3144,
+      "evaluation_wall_seconds": 7441,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "supervised",
+      "model": "large",
+      "seed": 42,
+      "training_steps": 20000,
+      "training_wall_seconds": 5227,
+      "evaluation_wall_seconds": 8799,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "supervised",
+      "model": "large",
+      "seed": 43,
+      "training_steps": 20000,
+      "training_wall_seconds": 5134,
+      "evaluation_wall_seconds": 9963,
+      "training_attempts": 1
+    },
+    {
+      "paradigm": "supervised",
+      "model": "large",
+      "seed": 44,
+      "training_steps": 20000,
+      "training_wall_seconds": 4976,
+      "evaluation_wall_seconds": 5439,
+      "training_attempts": 1
+    }
+  ],
+  "totals": {
+    "training_process_seconds": 33639,
+    "evaluation_process_seconds": 43860,
+    "total_process_seconds": 77499
+  },
+  "integrity": {
+    "rl_rows": 72,
+    "supervised_rows": 108,
+    "all_invalid_rates_zero": true,
+    "remote_hashes_verified_before_evaluation": true,
+    "remote_hashes_verified_before_cleanup": true,
+    "local_hashes_verified_after_transfer": true
+  },
+  "cleanup": {
+    "remaining_path": "~/q1-runs/logs",
+    "remaining_log_files": 55,
+    "remaining_footprint": "19M",
+    "voiceink_asr": "inactive, disabled",
+    "voiceink_llm": "inactive, disabled",
+    "sunshine": "left running"
+  },
+  "deviations": [
+    "The default PyPI PyTorch wheel selected CUDA 13 and was replaced with the official CUDA 12.6 wheel for Pascal support.",
+    "The first LSTM seed 42 and supervised small seed 42 wrappers failed before model execution because /usr/bin/time was unavailable; each was retried exactly once with shell epoch timing.",
+    "Fleet job inspection briefly misclassified healthy detached jobs; live process trees, logs, CPU clocks, CUDA contexts, and exit files were used as the source of truth.",
+    "An initial uv cache outside ~/q1-runs was left untouched because cleanup authorization was limited to the scratch tree."
+  ]
+}

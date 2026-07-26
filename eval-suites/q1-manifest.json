@@ -1,0 +1,35 @@
+{
+  "format_version": 1,
+  "suite_seed": 20260728,
+  "graphgen_sha256": "5a9de1c8ff44c693f797cb09c50d66b2374a810033b1163767c7ce8f7f3cd9f5",
+  "total_graphs": 3000,
+  "suites": [
+    {
+      "name": "train-scale",
+      "path": "q1-train-scale.json",
+      "n_min": 16,
+      "n_max": 32,
+      "episodes": 1000,
+      "range_seed": 1517598777,
+      "sha256": "c848ff46125e1cf6998a505a094a6efeb3e170091a67b7b241623a5a42727463"
+    },
+    {
+      "name": "near-ood",
+      "path": "q1-near-ood.json",
+      "n_min": 33,
+      "n_max": 48,
+      "episodes": 1000,
+      "range_seed": 50923834,
+      "sha256": "dba06cb89c76e674abc8d960ace768eca1ac13db2d2111eb724f8a8847b6145c"
+    },
+    {
+      "name": "far-ood",
+      "path": "q1-far-ood.json",
+      "n_min": 64,
+      "n_max": 96,
+      "episodes": 1000,
+      "range_seed": 419333821,
+      "sha256": "d93e4b086a054660f3e40d0e8d7b0170abb35569bae29e6d8d7a359207d83bbc"
+    }
+  ]
+}
