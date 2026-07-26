@@ -20,8 +20,11 @@ is exactly `-Δ(u,v)/w_max` — the literal "punish wrong direction" formulation
 
 ## Paper and experiment evidence
 
-- [`paper/dijkwalk-paper.pdf`](paper/dijkwalk-paper.pdf) — dense seven-page,
+- [`paper/dijkwalk-paper.pdf`](paper/dijkwalk-paper.pdf) — dense eight-page,
   two-column paper compiled from the accompanying LaTeX and BibTeX sources.
+  Rebuild with `make -C paper` (needs `tectonic` and `rsvg-convert`); the
+  Makefile regenerates `paper/figures/*.pdf` from the SVGs in `paper-results/`,
+  so regenerate a figure with its `scripts/plot_*.py` first.
 - [`paper/WORKSHOP-DRAFT.md`](paper/WORKSHOP-DRAFT.md) — workshop-style paper
   with methods, results, limitations, references, and reproducibility appendix.
 - [`paper/EXPERIMENT-SUMMARY.md`](paper/EXPERIMENT-SUMMARY.md) — concise audit

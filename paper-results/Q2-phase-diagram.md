@@ -32,9 +32,16 @@ VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \
 .venv/bin/python scripts/evaluate_q2_phase_grid.py --workers 8 \
   --goal-bonus <10|1|0> --out <result.json>
 .venv/bin/python scripts/merge_q2_bonus_ablation.py
-.venv/bin/python scripts/plot_q2_phase_grid.py
+.venv/bin/python scripts/plot_q2_phase_grid.py   # needs all three bonus JSONs
 .venv/bin/python scripts/export_q2_viz.py
 ```
+
+`plot_q2_phase_grid.py` reads `q2-phase-diagram.json` plus its `-g1` and `-g0`
+siblings and writes the paper figure: graded-minus-β=0 gap per cell against the
+predeclared 15 pp gate, one series per goal-bonus level, with per-seed ranges.
+It is sized 1:1 for `\textwidth` at 96 dpi, so changing `WIDTH` there also
+changes the on-page type size. Run the two bonus-ablation grids before it or it
+will fail on the missing files.
 
 Raw checkpoints, curves, per-process logs, and manifests remain in ignored
 `viz-data/q2/`. The committed JSON files contain every fixed-suite result,
