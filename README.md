@@ -18,6 +18,16 @@ is exactly `-Δ(u,v)/w_max` — the literal "punish wrong direction" formulation
 - `tests/test_env.py` — slot/adjacency mask correctness, r == -Δ/w_max,
   optimal-path telescoping, truncation, policy mask leak checks.
 
+## Paper and experiment evidence
+
+- [`paper/WORKSHOP-DRAFT.md`](paper/WORKSHOP-DRAFT.md) — workshop-style paper
+  with methods, results, limitations, references, and reproducibility appendix.
+- [`paper/EXPERIMENT-SUMMARY.md`](paper/EXPERIMENT-SUMMARY.md) — concise audit
+  of every question, decision gate, operational deviation, and artifact.
+- [`paper-results/`](paper-results/) — complete human-readable reports,
+  machine-readable aggregates, and paper-ready figures for Q1–Q4.
+- [`eval-suites/`](eval-suites/) — frozen, hash-pinned Q1 evaluation suites.
+
 ## Setup
 
 ```bash
