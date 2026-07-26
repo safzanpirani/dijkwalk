@@ -11,7 +11,6 @@
 \usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
-\usepackage{balance}
 
 \graphicspath{{figures/}}
 \setlist{nosep,leftmargin=*}
@@ -530,8 +529,12 @@ The merged Q1 dataset contains exactly 72 RL rows and 108 supervised rows;
 every row has invalid-action rate zero.  Q2 contains 162 fixed-suite
 conditions, also with zero invalid actions.  Q3 contains 108 learned evaluation
 conditions plus classical controls.  All checkpoints, curves, manifests, and
-evaluations encode their training seed.  Machine-readable aggregates, complete
-tables, plotting scripts, and suite manifests accompany the manuscript.
+evaluations encode their training seed.  Grid drivers are idempotent: a
+condition counts as complete only when its result JSON and checkpoint exist as
+a pair and the recorded configuration matches the request, so an interrupted
+sweep resumes without silently re-running or double-counting a cell.
+Machine-readable aggregates, complete tables, plotting scripts, and suite
+manifests accompany the manuscript.
 
 \appendix
 \section{Complete 5M Q1 Snapshot}
@@ -616,17 +619,39 @@ PPO, 500K & 73,867 & 96,141 & 1.30$\times$\\
 \end{tabular}
 \end{table}
 
-Two 120-step public-output traces, one graded and one binary, remain
-byte-identical across the scalar and vectorized implementations.  Exact graph
-generation and Dijkstra at reset account for roughly 74\% of the remaining
-full-environment time.  We therefore report the 1.30$\times$ PPO improvement
-rather than presenting the 18.72$\times$ kernel result as training speed.
+Behavior preservation is enforced by a characterization test written before the
+rewrite.  It folds 120 seeded steps of public output---observations, rewards,
+terminals, truncations, and serialized info---into a SHA-256 digest pinned for
+one graded and one binary reward configuration; vectorization leaves both
+digests unchanged, so the claim is checked rather than asserted.  The benchmark
+loads the pre-rewrite environment from its Git object rather than a copied
+file, keeping the baseline from drifting, and suppresses resets when timing the
+step kernel so graph construction is excluded from that row alone.
+
+Exact graph generation and Dijkstra at reset account for roughly 74\% of the
+remaining full-environment time.  We therefore report the 1.30$\times$ PPO
+improvement rather than presenting the 18.72$\times$ kernel result as training
+speed.
 
 \section{Execution Audit}
 
-Q1 ran on a GTX 1080 (compute capability 6.1) using an official CUDA 12.6
-PyTorch wheel.  At most two GPU processes ran concurrently under reduced
-priority, with OMP, MKL, and OpenBLAS thread counts capped at one.  Training and
+Q1 ran on a single GTX 1080 (Pascal, compute capability 6.1, 8\,GB).  The
+default PyPI PyTorch wheel resolves to a CUDA 13 build, which no longer
+supports Pascal; we pinned the official CUDA 12.6 wheel instead.  All training
+used \code{float32}, as this architecture provides neither bfloat16 nor tensor
+cores, and \code{torch.compile} is disabled.  At most two GPU processes ran
+concurrently under reduced priority, with every BLAS and thread-pool variable
+(OMP, MKL, OpenBLAS, vecLib, NumExpr) capped at one thread; that cap matters
+because the bottleneck is the CPU environment loop, so co-scheduled processes
+contend for cores well before they contend for the GPU.  Peak scratch use was
+8.3\,GB.
+
+Wall-clock is strongly asymmetric and does not track the matched MAC estimates.
+The 25M-step RL runs trained in 839--886\,s (LSTM) and 2,218--2,818\,s
+(Transformer), whereas the 20K-step supervised references trained in
+2,465--5,227\,s and then required 4,331--9,963\,s to \emph{evaluate}: 43,860 of
+77,499 total process-seconds went to evaluation rather than learning.  Training
+and
 evaluation logs were retained per seed.  Two first attempts failed before
 model execution because \code{/usr/bin/time} was unavailable; each traceback
 was retained and each wrapper was retried exactly once with shell epoch timing.
@@ -637,7 +662,6 @@ streamed back and counted before remote deletion: 24 RL files, 54 supervised
 files, and 12 evaluation JSONs.  Bulk remote artifacts and the shared virtual
 environment were removed after retrieval; raw logs were retained.
 
-\balance
 {\footnotesize
 \setlength{\bibsep}{1.5pt plus 0.3ex}
 \bibliographystyle{plainnat}
