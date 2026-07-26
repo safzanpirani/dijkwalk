@@ -107,3 +107,17 @@ The Q1 verification command assumed Ruff lived at .venv/bin/ruff, but this proje
 
 Q1 aggregation fails when invoked as `.venv/bin/python scripts/merge_q1_evaluations.py` because the script imports `scripts.evaluate_q1_rl` while Python puts only scripts/ on sys.path. Document/use `python -m scripts.merge_q1_evaluations` or make scripts a proper package-safe entrypoint.
 
+## 2026-07-26T17:40:17.608Z — codex — gpt-5.6-sol
+
+- **Directory:** `/Users/safzan/Development/projects/dijktrans-pufferlib/paper`
+- **Tags:** `misleading-error`
+
+While rendering an 8-page PDF for visual QA, pdftoppm emitted unpadded page-1.png names but the contact-sheet command assumed page-01.png. Check actual output naming or glob numerically before montage.
+
+## 2026-07-26T17:40:32.080Z — codex — gpt-5.6-sol
+
+- **Directory:** `/Users/safzan/Development/projects/dijktrans-pufferlib/paper`
+- **Tags:** `misleading-error`
+
+ImageMagick montage failed with 'unable to read font' even though the contact sheet requested no labels. Use resize plus +append/-append composition to avoid montage's implicit font dependency.
+

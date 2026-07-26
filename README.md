@@ -20,6 +20,8 @@ is exactly `-Δ(u,v)/w_max` — the literal "punish wrong direction" formulation
 
 ## Paper and experiment evidence
 
+- [`paper/dijkwalk-paper.pdf`](paper/dijkwalk-paper.pdf) — dense seven-page,
+  two-column paper compiled from the accompanying LaTeX and BibTeX sources.
 - [`paper/WORKSHOP-DRAFT.md`](paper/WORKSHOP-DRAFT.md) — workshop-style paper
   with methods, results, limitations, references, and reproducibility appendix.
 - [`paper/EXPERIMENT-SUMMARY.md`](paper/EXPERIMENT-SUMMARY.md) — concise audit
