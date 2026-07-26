@@ -1,0 +1,671 @@
+{
+  "config": {
+    "modes": [
+      "graded",
+      "sparse",
+      "binary"
+    ],
+    "regimes": {
+      "small": {
+        "n_min": 8,
+        "n_max": 16
+      },
+      "cold": {
+        "n_min": 32,
+        "n_max": 64
+      }
+    },
+    "budgets": {
+      "4n": 4.0,
+      "2n": 2.0,
+      "1p25n": 1.25
+    },
+    "train_seeds": [
+      42,
+      43,
+      44
+    ],
+    "episodes_per_run": 1000,
+    "batch_size": 250,
+    "suite_seed": 20260727,
+    "decoding": "sampled",
+    "tail_steps": 500000,
+    "horizon_rounding": "floor(max_steps_factor * n)"
+  },
+  "goal_bonus_levels": [
+    {
+      "goal_bonus": 10.0,
+      "source": "q2-phase-diagram.json",
+      "gate": {
+        "required_gap": 0.15,
+        "spread_rule": "min graded seed success > max sparse seed success",
+        "passed": false,
+        "passing_cells": [],
+        "invalid_rate_zero": true
+      },
+      "strongest_cell": {
+        "regime": "cold",
+        "budget": "1p25n",
+        "budget_factor": 1.25,
+        "train_seeds": [
+          42,
+          43,
+          44
+        ],
+        "graded_success": {
+          "mean": 0.8316666666666666,
+          "min": 0.821,
+          "max": 0.852
+        },
+        "sparse_success": {
+          "mean": 0.717,
+          "min": 0.703,
+          "max": 0.743
+        },
+        "graded_minus_sparse": 0.11466666666666658,
+        "paired_seed_gaps": [
+          0.118,
+          0.11699999999999999,
+          0.10899999999999999
+        ],
+        "non_overlapping_seed_ranges": true,
+        "passes_gate": false
+      },
+      "phase_cells": [
+        {
+          "regime": "small",
+          "budget": "4n",
+          "budget_factor": 4.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.997,
+            "min": 0.995,
+            "max": 0.999
+          },
+          "sparse_success": {
+            "mean": 0.9926666666666667,
+            "min": 0.991,
+            "max": 0.994
+          },
+          "graded_minus_sparse": 0.0043333333333333,
+          "paired_seed_gaps": [
+            0.006000000000000005,
+            0.0030000000000000027,
+            0.0040000000000000036
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "small",
+          "budget": "2n",
+          "budget_factor": 2.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.977,
+            "min": 0.973,
+            "max": 0.98
+          },
+          "sparse_success": {
+            "mean": 0.965,
+            "min": 0.96,
+            "max": 0.971
+          },
+          "graded_minus_sparse": 0.01200000000000001,
+          "paired_seed_gaps": [
+            0.020000000000000018,
+            0.007000000000000006,
+            0.009000000000000008
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "small",
+          "budget": "1p25n",
+          "budget_factor": 1.25,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9506666666666667,
+            "min": 0.947,
+            "max": 0.953
+          },
+          "sparse_success": {
+            "mean": 0.9313333333333333,
+            "min": 0.926,
+            "max": 0.936
+          },
+          "graded_minus_sparse": 0.019333333333333313,
+          "paired_seed_gaps": [
+            0.025999999999999912,
+            0.020999999999999908,
+            0.010999999999999899
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "4n",
+          "budget_factor": 4.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9706666666666667,
+            "min": 0.963,
+            "max": 0.976
+          },
+          "sparse_success": {
+            "mean": 0.8933333333333334,
+            "min": 0.867,
+            "max": 0.909
+          },
+          "graded_minus_sparse": 0.07733333333333325,
+          "paired_seed_gaps": [
+            0.10599999999999998,
+            0.05399999999999994,
+            0.07199999999999995
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "2n",
+          "budget_factor": 2.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.891,
+            "min": 0.863,
+            "max": 0.914
+          },
+          "sparse_success": {
+            "mean": 0.806,
+            "min": 0.781,
+            "max": 0.835
+          },
+          "graded_minus_sparse": 0.08499999999999996,
+          "paired_seed_gaps": [
+            0.08199999999999996,
+            0.09399999999999997,
+            0.07900000000000007
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "1p25n",
+          "budget_factor": 1.25,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.8316666666666666,
+            "min": 0.821,
+            "max": 0.852
+          },
+          "sparse_success": {
+            "mean": 0.717,
+            "min": 0.703,
+            "max": 0.743
+          },
+          "graded_minus_sparse": 0.11466666666666658,
+          "paired_seed_gaps": [
+            0.118,
+            0.11699999999999999,
+            0.10899999999999999
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        }
+      ]
+    },
+    {
+      "goal_bonus": 1.0,
+      "source": "q2-phase-diagram-g1.json",
+      "gate": {
+        "required_gap": 0.15,
+        "spread_rule": "min graded seed success > max sparse seed success",
+        "passed": false,
+        "passing_cells": [],
+        "invalid_rate_zero": true
+      },
+      "strongest_cell": {
+        "regime": "cold",
+        "budget": "1p25n",
+        "budget_factor": 1.25,
+        "train_seeds": [
+          42,
+          43,
+          44
+        ],
+        "graded_success": {
+          "mean": 0.8303333333333333,
+          "min": 0.821,
+          "max": 0.836
+        },
+        "sparse_success": {
+          "mean": 0.7086666666666667,
+          "min": 0.668,
+          "max": 0.755
+        },
+        "graded_minus_sparse": 0.12166666666666659,
+        "paired_seed_gaps": [
+          0.1529999999999999,
+          0.131,
+          0.08099999999999996
+        ],
+        "non_overlapping_seed_ranges": true,
+        "passes_gate": false
+      },
+      "phase_cells": [
+        {
+          "regime": "small",
+          "budget": "4n",
+          "budget_factor": 4.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9946666666666667,
+            "min": 0.992,
+            "max": 0.998
+          },
+          "sparse_success": {
+            "mean": 0.9906666666666667,
+            "min": 0.988,
+            "max": 0.992
+          },
+          "graded_minus_sparse": 0.0040000000000000036,
+          "paired_seed_gaps": [
+            0.006000000000000005,
+            0.006000000000000005,
+            0.0
+          ],
+          "non_overlapping_seed_ranges": false,
+          "passes_gate": false
+        },
+        {
+          "regime": "small",
+          "budget": "2n",
+          "budget_factor": 2.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9806666666666667,
+            "min": 0.976,
+            "max": 0.984
+          },
+          "sparse_success": {
+            "mean": 0.9626666666666667,
+            "min": 0.957,
+            "max": 0.972
+          },
+          "graded_minus_sparse": 0.018000000000000016,
+          "paired_seed_gaps": [
+            0.02300000000000002,
+            0.01200000000000001,
+            0.019000000000000017
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "small",
+          "budget": "1p25n",
+          "budget_factor": 1.25,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9473333333333334,
+            "min": 0.946,
+            "max": 0.949
+          },
+          "sparse_success": {
+            "mean": 0.9293333333333335,
+            "min": 0.927,
+            "max": 0.934
+          },
+          "graded_minus_sparse": 0.017999999999999905,
+          "paired_seed_gaps": [
+            0.02199999999999991,
+            0.018999999999999906,
+            0.0129999999999999
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "4n",
+          "budget_factor": 4.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9663333333333334,
+            "min": 0.961,
+            "max": 0.973
+          },
+          "sparse_success": {
+            "mean": 0.9023333333333333,
+            "min": 0.876,
+            "max": 0.918
+          },
+          "graded_minus_sparse": 0.06400000000000006,
+          "paired_seed_gaps": [
+            0.08899999999999997,
+            0.04299999999999993,
+            0.05999999999999994
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "2n",
+          "budget_factor": 2.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.8853333333333334,
+            "min": 0.876,
+            "max": 0.9
+          },
+          "sparse_success": {
+            "mean": 0.809,
+            "min": 0.778,
+            "max": 0.827
+          },
+          "graded_minus_sparse": 0.07633333333333336,
+          "paired_seed_gaps": [
+            0.05800000000000005,
+            0.09799999999999998,
+            0.07300000000000006
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "1p25n",
+          "budget_factor": 1.25,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.8303333333333333,
+            "min": 0.821,
+            "max": 0.836
+          },
+          "sparse_success": {
+            "mean": 0.7086666666666667,
+            "min": 0.668,
+            "max": 0.755
+          },
+          "graded_minus_sparse": 0.12166666666666659,
+          "paired_seed_gaps": [
+            0.1529999999999999,
+            0.131,
+            0.08099999999999996
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        }
+      ]
+    },
+    {
+      "goal_bonus": 0.0,
+      "source": "q2-phase-diagram-g0.json",
+      "gate": {
+        "required_gap": 0.15,
+        "spread_rule": "min graded seed success > max sparse seed success",
+        "passed": false,
+        "passing_cells": [],
+        "invalid_rate_zero": true
+      },
+      "strongest_cell": {
+        "regime": "cold",
+        "budget": "1p25n",
+        "budget_factor": 1.25,
+        "train_seeds": [
+          42,
+          43,
+          44
+        ],
+        "graded_success": {
+          "mean": 0.8246666666666668,
+          "min": 0.811,
+          "max": 0.842
+        },
+        "sparse_success": {
+          "mean": 0.7003333333333334,
+          "min": 0.681,
+          "max": 0.719
+        },
+        "graded_minus_sparse": 0.1243333333333334,
+        "paired_seed_gaps": [
+          0.12,
+          0.13,
+          0.123
+        ],
+        "non_overlapping_seed_ranges": true,
+        "passes_gate": false
+      },
+      "phase_cells": [
+        {
+          "regime": "small",
+          "budget": "4n",
+          "budget_factor": 4.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9936666666666666,
+            "min": 0.991,
+            "max": 0.997
+          },
+          "sparse_success": {
+            "mean": 0.9860000000000001,
+            "min": 0.985,
+            "max": 0.987
+          },
+          "graded_minus_sparse": 0.0076666666666664884,
+          "paired_seed_gaps": [
+            0.006000000000000005,
+            0.010000000000000009,
+            0.007000000000000006
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "small",
+          "budget": "2n",
+          "budget_factor": 2.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9740000000000001,
+            "min": 0.967,
+            "max": 0.979
+          },
+          "sparse_success": {
+            "mean": 0.9593333333333333,
+            "min": 0.957,
+            "max": 0.964
+          },
+          "graded_minus_sparse": 0.014666666666666828,
+          "paired_seed_gaps": [
+            0.02200000000000002,
+            0.01200000000000001,
+            0.010000000000000009
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "small",
+          "budget": "1p25n",
+          "budget_factor": 1.25,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9496666666666665,
+            "min": 0.943,
+            "max": 0.955
+          },
+          "sparse_success": {
+            "mean": 0.9289999999999999,
+            "min": 0.921,
+            "max": 0.94
+          },
+          "graded_minus_sparse": 0.02066666666666661,
+          "paired_seed_gaps": [
+            0.02199999999999991,
+            0.028999999999999915,
+            0.01100000000000001
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "4n",
+          "budget_factor": 4.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.9703333333333334,
+            "min": 0.967,
+            "max": 0.975
+          },
+          "sparse_success": {
+            "mean": 0.8613333333333332,
+            "min": 0.817,
+            "max": 0.893
+          },
+          "graded_minus_sparse": 0.10900000000000021,
+          "paired_seed_gaps": [
+            0.15200000000000002,
+            0.10099999999999998,
+            0.07399999999999995
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "2n",
+          "budget_factor": 2.0,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.8863333333333333,
+            "min": 0.876,
+            "max": 0.907
+          },
+          "sparse_success": {
+            "mean": 0.798,
+            "min": 0.779,
+            "max": 0.817
+          },
+          "graded_minus_sparse": 0.08833333333333326,
+          "paired_seed_gaps": [
+            0.07799999999999996,
+            0.09699999999999998,
+            0.09000000000000008
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        },
+        {
+          "regime": "cold",
+          "budget": "1p25n",
+          "budget_factor": 1.25,
+          "train_seeds": [
+            42,
+            43,
+            44
+          ],
+          "graded_success": {
+            "mean": 0.8246666666666668,
+            "min": 0.811,
+            "max": 0.842
+          },
+          "sparse_success": {
+            "mean": 0.7003333333333334,
+            "min": 0.681,
+            "max": 0.719
+          },
+          "graded_minus_sparse": 0.1243333333333334,
+          "paired_seed_gaps": [
+            0.12,
+            0.13,
+            0.123
+          ],
+          "non_overlapping_seed_ranges": true,
+          "passes_gate": false
+        }
+      ]
+    }
+  ],
+  "overall": {
+    "runs": 162,
+    "training_steps_per_run": 5000000,
+    "all_invalid_rates_zero": true,
+    "any_gate_passed": false,
+    "main_grid_gate_passed": false
+  }
+}

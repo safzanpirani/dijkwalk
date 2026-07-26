@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import Curves from './components/Curves'
 import GraphReplay, { usePlayback } from './components/GraphReplay'
+import PhaseDiagram from './components/PhaseDiagram'
 import StepPanel from './components/StepPanel'
-import type { Experiment, TraceFile } from './types'
+import type { Experiment, Q2PhaseDiagram, TraceFile } from './types'
 import { fmt } from './lib'
 
 const TRACE_SOURCES: { id: string; file: string; label: string }[] = [
@@ -226,8 +227,23 @@ function Experiments() {
   )
 }
 
+function Q2Phase() {
+  const data = useJson<Q2PhaseDiagram>('data/q2-phase-diagram.json')
+  if (data === 'missing') {
+    return (
+      <div className="rounded-lg border border-ring bg-surface p-8 text-ink-2">
+        Q2 phase-diagram data is missing from{' '}
+        <code>data/q2-phase-diagram.json</code>.
+      </div>
+    )
+  }
+  if (!data) return <div className="p-8 text-ink-3">loading…</div>
+  return <PhaseDiagram data={data} />
+}
+
 export default function App() {
-  const [tab, setTab] = useState<'replay' | 'experiments'>('replay')
+  const [tab, setTab] =
+    useState<'replay' | 'experiments' | 'phase'>('replay')
   return (
     <div className="blueprint min-h-screen">
       <div className="mx-auto max-w-[1500px] px-6 py-8">
@@ -252,6 +268,7 @@ export default function App() {
               [
                 ['replay', 'WALK REPLAY'],
                 ['experiments', 'ABLATIONS'],
+                ['phase', 'PHASE DIAGRAM'],
               ] as const
             ).map(([id, label]) => (
               <button
@@ -269,7 +286,13 @@ export default function App() {
           </nav>
         </header>
 
-        {tab === 'replay' ? <Replay /> : <Experiments />}
+        {tab === 'replay' ? (
+          <Replay />
+        ) : tab === 'experiments' ? (
+          <Experiments />
+        ) : (
+          <Q2Phase />
+        )}
 
         <footer className="mt-16 border-t border-ring pt-4 text-[11px] text-ink-3">
           reward r = (−w + β·(φ(u)−φ(v)))/w_max − c · shaped per Ng et al. 1999

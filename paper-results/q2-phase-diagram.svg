@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="55.0" y="60.0" font-family="system-ui, sans-serif" font-size="28" font-weight="750" fill="#0f172a">When does graded shaping matter?</text>
+<text x="55.0" y="94.0" font-family="system-ui, sans-serif" font-size="15" fill="#475569">Cell = sampled success gap (graded − sparse), mean over three training seeds</text>
+<text x="340.0" y="152.0" font-family="system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#334155">4n</text>
+<text x="600.0" y="152.0" font-family="system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#334155">2n</text>
+<text x="860.0" y="152.0" font-family="system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#334155">1.25n</text>
+<text x="600.0" y="114.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#64748b">Episode step budget</text>
+<text x="182.0" y="256.0" font-family="system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="end" fill="#334155">Small fixed</text>
+<text x="182.0" y="282.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="end" fill="#64748b">n=8–16</text>
+<rect x="210" y="180" width="260" height="170" rx="8" fill="rgb(246,248,252)" stroke="#cbd5e1" stroke-width="2"/>
+<text x="340.0" y="243.0" font-family="system-ui, sans-serif" font-size="31" font-weight="800" text-anchor="middle" fill="#0f172a">+0.4 pp</text>
+<text x="340.0" y="281.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">graded 99.7%  ·  sparse 99.3%</text>
+<text x="340.0" y="310.0" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#0f172a" opacity="0.85">seed ranges 99.5–99.9 / 99.1–99.4</text>
+<rect x="470" y="180" width="260" height="170" rx="8" fill="rgb(244,244,251)" stroke="#cbd5e1" stroke-width="2"/>
+<text x="600.0" y="243.0" font-family="system-ui, sans-serif" font-size="31" font-weight="800" text-anchor="middle" fill="#0f172a">+1.2 pp</text>
+<text x="600.0" y="281.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">graded 97.7%  ·  sparse 96.5%</text>
+<text x="600.0" y="310.0" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#0f172a" opacity="0.85">seed ranges 97.3–98.0 / 96.0–97.1</text>
+<rect x="730" y="180" width="260" height="170" rx="8" fill="rgb(241,240,250)" stroke="#cbd5e1" stroke-width="2"/>
+<text x="860.0" y="243.0" font-family="system-ui, sans-serif" font-size="31" font-weight="800" text-anchor="middle" fill="#0f172a">+1.9 pp</text>
+<text x="860.0" y="281.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">graded 95.1%  ·  sparse 93.1%</text>
+<text x="860.0" y="310.0" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#0f172a" opacity="0.85">seed ranges 94.7–95.3 / 92.6–93.6</text>
+<text x="182.0" y="426.0" font-family="system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="end" fill="#334155">Cold start</text>
+<text x="182.0" y="452.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="end" fill="#64748b">n=32–64</text>
+<rect x="210" y="350" width="260" height="170" rx="8" fill="rgb(221,209,245)" stroke="#cbd5e1" stroke-width="2"/>
+<text x="340.0" y="413.0" font-family="system-ui, sans-serif" font-size="31" font-weight="800" text-anchor="middle" fill="#0f172a">+7.7 pp</text>
+<text x="340.0" y="451.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">graded 97.1%  ·  sparse 89.3%</text>
+<text x="340.0" y="480.0" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#0f172a" opacity="0.85">seed ranges 96.3–97.6 / 86.7–90.9</text>
+<rect x="470" y="350" width="260" height="170" rx="8" fill="rgb(218,205,245)" stroke="#cbd5e1" stroke-width="2"/>
+<text x="600.0" y="413.0" font-family="system-ui, sans-serif" font-size="31" font-weight="800" text-anchor="middle" fill="#0f172a">+8.5 pp</text>
+<text x="600.0" y="451.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">graded 89.1%  ·  sparse 80.6%</text>
+<text x="600.0" y="480.0" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#0f172a" opacity="0.85">seed ranges 86.3–91.4 / 78.1–83.5</text>
+<rect x="730" y="350" width="260" height="170" rx="8" fill="rgb(208,190,242)" stroke="#cbd5e1" stroke-width="2"/>
+<text x="860.0" y="413.0" font-family="system-ui, sans-serif" font-size="31" font-weight="800" text-anchor="middle" fill="#0f172a">+11.5 pp</text>
+<text x="860.0" y="451.0" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">graded 83.2%  ·  sparse 71.7%</text>
+<text x="860.0" y="480.0" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle" fill="#0f172a" opacity="0.85">seed ranges 82.1–85.2 / 70.3–74.3</text>
+<text x="55.0" y="570.0" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#9f1239">HONEST NULL — no cell reaches ≥15 pp with non-overlapping seed ranges</text>
+<text x="55.0" y="604.0" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Shared 1,000-graph suites per size regime; 5M-step LSTM/Muon policies; goal bonus = 10; no curriculum.</text>
+</svg>

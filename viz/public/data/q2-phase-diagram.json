@@ -1,0 +1,189 @@
+{
+  "config": {
+    "goal_bonus": 10.0,
+    "train_seeds": [
+      42,
+      43,
+      44
+    ],
+    "episodes_per_run": 1000,
+    "decoding": "sampled"
+  },
+  "gate": {
+    "required_gap": 0.15,
+    "spread_rule": "min graded seed success > max sparse seed success",
+    "passed": false,
+    "passing_cells": [],
+    "invalid_rate_zero": true
+  },
+  "phase_cells": [
+    {
+      "regime": "small",
+      "budget": "4n",
+      "budget_factor": 4.0,
+      "train_seeds": [
+        42,
+        43,
+        44
+      ],
+      "graded_success": {
+        "mean": 0.997,
+        "min": 0.995,
+        "max": 0.999
+      },
+      "sparse_success": {
+        "mean": 0.9926666666666667,
+        "min": 0.991,
+        "max": 0.994
+      },
+      "graded_minus_sparse": 0.0043333333333333,
+      "paired_seed_gaps": [
+        0.006000000000000005,
+        0.0030000000000000027,
+        0.0040000000000000036
+      ],
+      "non_overlapping_seed_ranges": true,
+      "passes_gate": false
+    },
+    {
+      "regime": "small",
+      "budget": "2n",
+      "budget_factor": 2.0,
+      "train_seeds": [
+        42,
+        43,
+        44
+      ],
+      "graded_success": {
+        "mean": 0.977,
+        "min": 0.973,
+        "max": 0.98
+      },
+      "sparse_success": {
+        "mean": 0.965,
+        "min": 0.96,
+        "max": 0.971
+      },
+      "graded_minus_sparse": 0.01200000000000001,
+      "paired_seed_gaps": [
+        0.020000000000000018,
+        0.007000000000000006,
+        0.009000000000000008
+      ],
+      "non_overlapping_seed_ranges": true,
+      "passes_gate": false
+    },
+    {
+      "regime": "small",
+      "budget": "1p25n",
+      "budget_factor": 1.25,
+      "train_seeds": [
+        42,
+        43,
+        44
+      ],
+      "graded_success": {
+        "mean": 0.9506666666666667,
+        "min": 0.947,
+        "max": 0.953
+      },
+      "sparse_success": {
+        "mean": 0.9313333333333333,
+        "min": 0.926,
+        "max": 0.936
+      },
+      "graded_minus_sparse": 0.019333333333333313,
+      "paired_seed_gaps": [
+        0.025999999999999912,
+        0.020999999999999908,
+        0.010999999999999899
+      ],
+      "non_overlapping_seed_ranges": true,
+      "passes_gate": false
+    },
+    {
+      "regime": "cold",
+      "budget": "4n",
+      "budget_factor": 4.0,
+      "train_seeds": [
+        42,
+        43,
+        44
+      ],
+      "graded_success": {
+        "mean": 0.9706666666666667,
+        "min": 0.963,
+        "max": 0.976
+      },
+      "sparse_success": {
+        "mean": 0.8933333333333334,
+        "min": 0.867,
+        "max": 0.909
+      },
+      "graded_minus_sparse": 0.07733333333333325,
+      "paired_seed_gaps": [
+        0.10599999999999998,
+        0.05399999999999994,
+        0.07199999999999995
+      ],
+      "non_overlapping_seed_ranges": true,
+      "passes_gate": false
+    },
+    {
+      "regime": "cold",
+      "budget": "2n",
+      "budget_factor": 2.0,
+      "train_seeds": [
+        42,
+        43,
+        44
+      ],
+      "graded_success": {
+        "mean": 0.891,
+        "min": 0.863,
+        "max": 0.914
+      },
+      "sparse_success": {
+        "mean": 0.806,
+        "min": 0.781,
+        "max": 0.835
+      },
+      "graded_minus_sparse": 0.08499999999999996,
+      "paired_seed_gaps": [
+        0.08199999999999996,
+        0.09399999999999997,
+        0.07900000000000007
+      ],
+      "non_overlapping_seed_ranges": true,
+      "passes_gate": false
+    },
+    {
+      "regime": "cold",
+      "budget": "1p25n",
+      "budget_factor": 1.25,
+      "train_seeds": [
+        42,
+        43,
+        44
+      ],
+      "graded_success": {
+        "mean": 0.8316666666666666,
+        "min": 0.821,
+        "max": 0.852
+      },
+      "sparse_success": {
+        "mean": 0.717,
+        "min": 0.703,
+        "max": 0.743
+      },
+      "graded_minus_sparse": 0.11466666666666658,
+      "paired_seed_gaps": [
+        0.118,
+        0.11699999999999999,
+        0.10899999999999999
+      ],
+      "non_overlapping_seed_ranges": true,
+      "passes_gate": false
+    }
+  ]
+}

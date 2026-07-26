@@ -77,3 +77,36 @@ export interface Experiment {
   num_envs: number
   curve: CurvePoint[]
 }
+
+export interface Q2SuccessRange {
+  mean: number
+  min: number
+  max: number
+}
+
+export interface Q2PhaseCell {
+  regime: 'small' | 'cold'
+  budget: '4n' | '2n' | '1p25n'
+  budget_factor: number
+  graded_success: Q2SuccessRange
+  sparse_success: Q2SuccessRange
+  graded_minus_sparse: number
+  non_overlapping_seed_ranges: boolean
+  passes_gate: boolean
+}
+
+export interface Q2PhaseDiagram {
+  config: {
+    goal_bonus: number
+    train_seeds: number[]
+    episodes_per_run: number
+    decoding: 'sampled' | 'greedy'
+  }
+  gate: {
+    required_gap: number
+    spread_rule: string
+    passed: boolean
+    invalid_rate_zero: boolean
+  }
+  phase_cells: Q2PhaseCell[]
+}
